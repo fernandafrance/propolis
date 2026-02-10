@@ -9,6 +9,10 @@ const excelInput = document.getElementById("excelFile");
 const exportExcelBtn = document.getElementById("exportExcel");
 const clearAllBtn = document.getElementById("clearAll");
 
+// ✅ NOVO botão Export JSON
+const exportJSONBtn = document.getElementById("exportJSONBtn");
+
+
 // =======================
 // Columns
 // =======================
@@ -56,93 +60,59 @@ let data = [];
 
 
 // =======================
-// JSON FILE NAME
-// =======================
-const JSON_FILE = "data.json";
-
-
-// =======================
 // LocalStorage
 // =======================
 function saveData() {
-  localStorage.setItem("propolisData", JSON.stringify(data));
+
+  localStorage.setItem(
+    "propolisData",
+    JSON.stringify(data)
+  );
+
 }
 
-function loadDataFromLocalStorage() {
-  const stored = localStorage.getItem("propolisData");
-  return stored ? JSON.parse(stored) : [];
-}
 
+function loadData() {
 
-// =======================
-// Load from JSON (GitHub)
-// =======================
-async function loadDataFromJSON() {
-  try {
+  const stored =
+    localStorage.getItem("propolisData");
 
-    const response = await fetch(JSON_FILE + "?v=" + Date.now());
+  data =
+    stored
+    ? JSON.parse(stored)
+    : [];
 
-    if (!response.ok)
-      throw new Error("JSON not found");
-
-    const jsonData = await response.json();
-
-    const localData = loadDataFromLocalStorage();
-
-    const merged = mergeData(jsonData, localData);
-
-    data = merged;
-
-    saveData();
-
-  } catch (error) {
-
-    console.warn("Using localStorage (JSON not available)");
-
-    data = loadDataFromLocalStorage();
-
-  }
-
-  renderTable();
 }
 
 
 // =======================
-// Merge data avoiding duplicates
-// =======================
-function mergeData(jsonData, localData) {
-
-  const map = new Map();
-
-  jsonData.forEach(row => {
-    map.set(makeKey(row), row);
-  });
-
-  localData.forEach(row => {
-    map.set(makeKey(row), row);
-  });
-
-  return Array.from(map.values());
-}
-
-
-// =======================
-// Export JSON (for GitHub update)
+// ✅ Export JSON function
 // =======================
 function exportJSON() {
 
   const blob = new Blob(
+
     [JSON.stringify(data, null, 2)],
+
     { type: "application/json" }
+
   );
 
-  const link = document.createElement("a");
+  const link =
+    document.createElement("a");
 
-  link.href = URL.createObjectURL(blob);
+  link.href =
+    URL.createObjectURL(blob);
 
-  link.download = "data.json";
+  link.download =
+    "data.json";
+
+  document.body.appendChild(link);
 
   link.click();
+
+  document.body.removeChild(link);
+
 }
 
 
@@ -150,7 +120,17 @@ function exportJSON() {
 // Unique key
 // =======================
 function makeKey(row) {
-  return `${(row.InChIKey || "").trim()}__${(row.CID || "").trim()}`;
+
+  return `${
+
+    (row.InChIKey || "").trim()
+
+  }__${
+  
+    (row.CID || "").trim()
+
+  }`;
+
 }
 
 
@@ -159,16 +139,28 @@ function makeKey(row) {
 // =======================
 function getFilteredData(filter = "") {
 
-  if (!filter.trim()) return data;
+  if (!filter.trim())
+    return data;
 
-  const term = filter.toLowerCase();
+  const term =
+    filter.toLowerCase();
 
   return data.filter(row =>
+
     columns.some(col =>
-      col !== "PubChem" &&
-      String(row[col] || "").toLowerCase().includes(term)
+
+      col !== "PubChem"
+
+      &&
+
+      String(row[col] || "")
+      .toLowerCase()
+      .includes(term)
+
     )
+
   );
+
 }
 
 
@@ -179,25 +171,36 @@ function renderTable(filter = "") {
 
   tableBody.innerHTML = "";
 
-  const filtered = getFilteredData(filter);
+  const filtered =
+    getFilteredData(filter);
+
 
   filtered.forEach((row, index) => {
 
-    const tr = document.createElement("tr");
+    const tr =
+      document.createElement("tr");
+
 
     columns.forEach(col => {
 
-      const td = document.createElement("td");
+      const td =
+        document.createElement("td");
+
 
       if (col === "PubChem" && row.CID) {
 
-        const a = document.createElement("a");
+        const a =
+          document.createElement("a");
 
-        a.href = `https://pubchem.ncbi.nlm.nih.gov/compound/${row.CID}`;
+        a.href =
+          `https://pubchem.ncbi.nlm.nih.gov/compound/${row.CID}`;
 
         a.target = "_blank";
 
-        a.textContent = "PubChem";
+        a.rel = "noopener";
+
+        a.textContent =
+          "PubChem";
 
         td.appendChild(a);
 
@@ -211,11 +214,16 @@ function renderTable(filter = "") {
           .map(r => r.trim())
           .join(",<br>");
 
+        td.classList.add(
+          "references-cell"
+        );
+
       }
 
       else {
 
-        td.textContent = row[col] || "";
+        td.textContent =
+          row[col] || "";
 
       }
 
@@ -224,13 +232,22 @@ function renderTable(filter = "") {
     });
 
 
-    const tdRemove = document.createElement("td");
+    const tdRemove =
+      document.createElement("td");
 
-    const btn = document.createElement("button");
+    tdRemove.className =
+      "narrow";
 
-    btn.textContent = "✕";
 
-    btn.onclick = () => removeRow(index);
+    const btn =
+      document.createElement("button");
+
+    btn.textContent =
+      "✕";
+
+    btn.onclick =
+      () => removeRow(index);
+
 
     tdRemove.appendChild(btn);
 
@@ -240,7 +257,9 @@ function renderTable(filter = "") {
 
   });
 
-  rowCount.textContent = `${filtered.length} row(s)`;
+
+  rowCount.textContent =
+    `${filtered.length} row(s)`;
 
 }
 
@@ -252,6 +271,7 @@ form.addEventListener("submit", e => {
 
   e.preventDefault();
 
+
   const required = [
 
     form.elements["Name Normalized"],
@@ -261,20 +281,33 @@ form.addEventListener("submit", e => {
 
   ];
 
-  if (required.filter(f => f.value.trim()).length < 2) {
+
+  if (
+
+    required.filter(
+      f => f.value.trim()
+    ).length < 2
+
+  ) {
 
     formError.textContent =
-      "Fill at least 2 required fields.";
+      "Please fill at least 2 required fields.";
 
     return;
 
   }
 
-  formError.textContent = "";
 
-  const formData = new FormData(form);
+  formError.textContent =
+    "";
+
+
+  const formData =
+    new FormData(form);
+
 
   const row = {};
+
 
   columns.forEach(col => {
 
@@ -286,20 +319,28 @@ form.addEventListener("submit", e => {
   });
 
 
-  const key = makeKey(row);
+  const key =
+    makeKey(row);
+
 
   const index =
-    data.findIndex(r => makeKey(r) === key);
+    data.findIndex(
+      r => makeKey(r) === key
+    );
+
 
   if (index >= 0)
     data[index] = row;
+
   else
     data.push(row);
 
 
   saveData();
 
-  renderTable(searchInput.value);
+  renderTable(
+    searchInput.value
+  );
 
   form.reset();
 
@@ -315,7 +356,9 @@ function removeRow(index) {
 
   saveData();
 
-  renderTable(searchInput.value);
+  renderTable(
+    searchInput.value
+  );
 
 }
 
@@ -325,11 +368,16 @@ function removeRow(index) {
 // =======================
 clearAllBtn.addEventListener("click", () => {
 
-  if (!confirm("Delete ALL data?")) return;
+  if (!confirm(
+    "Delete ALL data?"
+  )) return;
+
 
   data = [];
 
-  saveData();
+  localStorage.removeItem(
+    "propolisData"
+  );
 
   renderTable();
 
@@ -339,17 +387,25 @@ clearAllBtn.addEventListener("click", () => {
 // =======================
 // Search
 // =======================
-searchInput.addEventListener("input", () =>
-  renderTable(searchInput.value)
+searchInput.addEventListener(
+  "input",
+  () =>
+    renderTable(
+      searchInput.value
+    )
 );
 
-clearSearchBtn.addEventListener("click", () => {
 
-  searchInput.value = "";
+clearSearchBtn.addEventListener(
+  "click",
+  () => {
 
-  renderTable();
+    searchInput.value = "";
 
-});
+    renderTable();
+
+  }
+);
 
 
 // =======================
@@ -357,30 +413,46 @@ clearSearchBtn.addEventListener("click", () => {
 // =======================
 excelInput.addEventListener("change", e => {
 
-  const file = e.target.files[0];
+  const file =
+    e.target.files[0];
 
   if (!file) return;
 
-  const reader = new FileReader();
+
+  const reader =
+    new FileReader();
+
 
   reader.onload = e => {
 
     const workbook =
-      XLSX.read(new Uint8Array(e.target.result),
-        { type: "array" });
+      XLSX.read(
+
+        new Uint8Array(
+          e.target.result
+        ),
+
+        { type: "array" }
+
+      );
+
 
     const sheet =
       workbook.Sheets[
         workbook.SheetNames[0]
       ];
 
+
     const imported =
-      XLSX.utils.sheet_to_json(sheet);
+      XLSX.utils.sheet_to_json(
+        sheet
+      );
 
 
     imported.forEach(row => {
 
       const newRow = {};
+
 
       columns.forEach(col => {
 
@@ -391,24 +463,35 @@ excelInput.addEventListener("change", e => {
 
       });
 
-      const key = makeKey(newRow);
+
+      const key =
+        makeKey(newRow);
+
 
       const index =
-        data.findIndex(r =>
-          makeKey(r) === key);
+        data.findIndex(
+          r =>
+            makeKey(r) === key
+        );
+
 
       if (index >= 0)
         data[index] = newRow;
+
       else
         data.push(newRow);
 
     });
 
+
     saveData();
 
-    renderTable(searchInput.value);
+    renderTable(
+      searchInput.value
+    );
 
   };
+
 
   reader.readAsArrayBuffer(file);
 
@@ -421,36 +504,55 @@ excelInput.addEventListener("change", e => {
 exportExcelBtn.addEventListener("click", () => {
 
   const filtered =
-    getFilteredData(searchInput.value);
+    getFilteredData(
+      searchInput.value
+    );
+
 
   const worksheet =
-    XLSX.utils.json_to_sheet(filtered);
+    XLSX.utils.json_to_sheet(
+      filtered
+    );
+
 
   const workbook =
     XLSX.utils.book_new();
 
+
   XLSX.utils.book_append_sheet(
+
     workbook,
+
     worksheet,
+
     "PropolisData"
+
   );
 
+
   XLSX.writeFile(
+
     workbook,
+
     "propolis_data.xlsx"
+
   );
 
 });
 
 
 // =======================
-// INIT
+// ✅ Export JSON button event
 // =======================
-loadDataFromJSON();
+exportJSONBtn.addEventListener(
+  "click",
+  exportJSON
+);
 
 
 // =======================
-// OPTIONAL:
-// expose exportJSON button
+// Init
 // =======================
-window.exportJSON = exportJSON;
+loadData();
+
+renderTable();
