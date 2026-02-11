@@ -8,8 +8,6 @@ const formError = document.getElementById("formError");
 const excelInput = document.getElementById("excelFile");
 const exportExcelBtn = document.getElementById("exportExcel");
 const clearAllBtn = document.getElementById("clearAll");
-
-// ✅ NOVO botão Export JSON
 const exportJSONBtn = document.getElementById("exportJSONBtn");
 
 
@@ -60,52 +58,68 @@ let data = [];
 
 
 // =======================
-// LocalStorage
+// Save LocalStorage
 // =======================
 function saveData() {
-
-  localStorage.setItem(
-    "propolisData",
-    JSON.stringify(data)
-  );
-
+  localStorage.setItem("propolisData", JSON.stringify(data));
 }
 
 
-function loadData() {
+// =======================
+// ✅ Load from JSON or LocalStorage
+// =======================
+async function loadData() {
 
-  const stored =
-    localStorage.getItem("propolisData");
+  try {
 
-  data =
-    stored
-    ? JSON.parse(stored)
-    : [];
+    // tenta carregar data.json do GitHub
+    const response = await fetch("data.json");
+
+    if (response.ok) {
+
+      const jsonData = await response.json();
+
+      if (jsonData.length > 0) {
+
+        data = jsonData;
+
+        saveData();
+
+        return;
+
+      }
+
+    }
+
+  } catch (error) {
+
+    console.warn("data.json não encontrado, usando localStorage");
+
+  }
+
+  // fallback para localStorage
+  const stored = localStorage.getItem("propolisData");
+
+  data = stored ? JSON.parse(stored) : [];
 
 }
 
 
 // =======================
-// ✅ Export JSON function
+// Export JSON
 // =======================
 function exportJSON() {
 
   const blob = new Blob(
-
     [JSON.stringify(data, null, 2)],
-
     { type: "application/json" }
-
   );
 
-  const link =
-    document.createElement("a");
+  const link = document.createElement("a");
 
-  link.href =
-    URL.createObjectURL(blob);
+  link.href = URL.createObjectURL(blob);
 
-  link.download =
-    "data.json";
+  link.download = "data.json";
 
   document.body.appendChild(link);
 
@@ -121,15 +135,7 @@ function exportJSON() {
 // =======================
 function makeKey(row) {
 
-  return `${
-
-    (row.InChIKey || "").trim()
-
-  }__${
-  
-    (row.CID || "").trim()
-
-  }`;
+  return `${(row.InChIKey || "").trim()}__${(row.CID || "").trim()}`;
 
 }
 
@@ -139,26 +145,15 @@ function makeKey(row) {
 // =======================
 function getFilteredData(filter = "") {
 
-  if (!filter.trim())
-    return data;
+  if (!filter.trim()) return data;
 
-  const term =
-    filter.toLowerCase();
+  const term = filter.toLowerCase();
 
   return data.filter(row =>
-
     columns.some(col =>
-
-      col !== "PubChem"
-
-      &&
-
-      String(row[col] || "")
-      .toLowerCase()
-      .includes(term)
-
+      col !== "PubChem" &&
+      String(row[col] || "").toLowerCase().includes(term)
     )
-
   );
 
 }
@@ -171,36 +166,25 @@ function renderTable(filter = "") {
 
   tableBody.innerHTML = "";
 
-  const filtered =
-    getFilteredData(filter);
-
+  const filtered = getFilteredData(filter);
 
   filtered.forEach((row, index) => {
 
-    const tr =
-      document.createElement("tr");
-
+    const tr = document.createElement("tr");
 
     columns.forEach(col => {
 
-      const td =
-        document.createElement("td");
-
+      const td = document.createElement("td");
 
       if (col === "PubChem" && row.CID) {
 
-        const a =
-          document.createElement("a");
+        const a = document.createElement("a");
 
-        a.href =
-          `https://pubchem.ncbi.nlm.nih.gov/compound/${row.CID}`;
+        a.href = `https://pubchem.ncbi.nlm.nih.gov/compound/${row.CID}`;
 
         a.target = "_blank";
 
-        a.rel = "noopener";
-
-        a.textContent =
-          "PubChem";
+        a.textContent = "PubChem";
 
         td.appendChild(a);
 
@@ -208,22 +192,16 @@ function renderTable(filter = "") {
 
       else if (col === "References" && row[col]) {
 
-        td.innerHTML =
-          row[col]
+        td.innerHTML = row[col]
           .split(",")
           .map(r => r.trim())
           .join(",<br>");
-
-        td.classList.add(
-          "references-cell"
-        );
 
       }
 
       else {
 
-        td.textContent =
-          row[col] || "";
+        td.textContent = row[col] || "";
 
       }
 
@@ -232,22 +210,13 @@ function renderTable(filter = "") {
     });
 
 
-    const tdRemove =
-      document.createElement("td");
+    const tdRemove = document.createElement("td");
 
-    tdRemove.className =
-      "narrow";
+    const btn = document.createElement("button");
 
+    btn.textContent = "✕";
 
-    const btn =
-      document.createElement("button");
-
-    btn.textContent =
-      "✕";
-
-    btn.onclick =
-      () => removeRow(index);
-
+    btn.onclick = () => removeRow(index);
 
     tdRemove.appendChild(btn);
 
@@ -257,9 +226,7 @@ function renderTable(filter = "") {
 
   });
 
-
-  rowCount.textContent =
-    `${filtered.length} row(s)`;
+  rowCount.textContent = `${filtered.length} row(s)`;
 
 }
 
@@ -271,76 +238,47 @@ form.addEventListener("submit", e => {
 
   e.preventDefault();
 
-
   const required = [
-
     form.elements["Name Normalized"],
     form.elements["IUPAC Name"],
     form.elements["Molecular Weight"],
     form.elements["Canonical SMILES"]
-
   ];
 
+  if (required.filter(f => f.value.trim()).length < 2) {
 
-  if (
-
-    required.filter(
-      f => f.value.trim()
-    ).length < 2
-
-  ) {
-
-    formError.textContent =
-      "Please fill at least 2 required fields.";
+    formError.textContent = "Please fill at least 2 required fields.";
 
     return;
 
   }
 
+  formError.textContent = "";
 
-  formError.textContent =
-    "";
-
-
-  const formData =
-    new FormData(form);
-
+  const formData = new FormData(form);
 
   const row = {};
 
-
   columns.forEach(col => {
 
-    row[col] =
-      col === "PubChem"
+    row[col] = col === "PubChem"
       ? ""
       : (formData.get(col)?.trim() || "");
 
   });
 
+  const key = makeKey(row);
 
-  const key =
-    makeKey(row);
-
-
-  const index =
-    data.findIndex(
-      r => makeKey(r) === key
-    );
-
+  const index = data.findIndex(r => makeKey(r) === key);
 
   if (index >= 0)
     data[index] = row;
-
   else
     data.push(row);
 
-
   saveData();
 
-  renderTable(
-    searchInput.value
-  );
+  renderTable(searchInput.value);
 
   form.reset();
 
@@ -356,9 +294,7 @@ function removeRow(index) {
 
   saveData();
 
-  renderTable(
-    searchInput.value
-  );
+  renderTable(searchInput.value);
 
 }
 
@@ -368,16 +304,11 @@ function removeRow(index) {
 // =======================
 clearAllBtn.addEventListener("click", () => {
 
-  if (!confirm(
-    "Delete ALL data?"
-  )) return;
-
+  if (!confirm("Delete ALL data?")) return;
 
   data = [];
 
-  localStorage.removeItem(
-    "propolisData"
-  );
+  localStorage.removeItem("propolisData");
 
   renderTable();
 
@@ -387,25 +318,17 @@ clearAllBtn.addEventListener("click", () => {
 // =======================
 // Search
 // =======================
-searchInput.addEventListener(
-  "input",
-  () =>
-    renderTable(
-      searchInput.value
-    )
+searchInput.addEventListener("input", () =>
+  renderTable(searchInput.value)
 );
 
+clearSearchBtn.addEventListener("click", () => {
 
-clearSearchBtn.addEventListener(
-  "click",
-  () => {
+  searchInput.value = "";
 
-    searchInput.value = "";
+  renderTable();
 
-    renderTable();
-
-  }
-);
+});
 
 
 // =======================
@@ -413,85 +336,51 @@ clearSearchBtn.addEventListener(
 // =======================
 excelInput.addEventListener("change", e => {
 
-  const file =
-    e.target.files[0];
+  const file = e.target.files[0];
 
   if (!file) return;
 
-
-  const reader =
-    new FileReader();
-
+  const reader = new FileReader();
 
   reader.onload = e => {
 
-    const workbook =
-      XLSX.read(
+    const workbook = XLSX.read(
+      new Uint8Array(e.target.result),
+      { type: "array" }
+    );
 
-        new Uint8Array(
-          e.target.result
-        ),
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-        { type: "array" }
-
-      );
-
-
-    const sheet =
-      workbook.Sheets[
-        workbook.SheetNames[0]
-      ];
-
-
-    const imported =
-      XLSX.utils.sheet_to_json(
-        sheet
-      );
-
+    const imported = XLSX.utils.sheet_to_json(sheet);
 
     imported.forEach(row => {
 
       const newRow = {};
 
-
       columns.forEach(col => {
 
-        newRow[col] =
-          col === "PubChem"
+        newRow[col] = col === "PubChem"
           ? ""
           : (row[col]?.toString().trim() || "");
 
       });
 
+      const key = makeKey(newRow);
 
-      const key =
-        makeKey(newRow);
-
-
-      const index =
-        data.findIndex(
-          r =>
-            makeKey(r) === key
-        );
-
+      const index = data.findIndex(r => makeKey(r) === key);
 
       if (index >= 0)
         data[index] = newRow;
-
       else
         data.push(newRow);
 
     });
 
-
     saveData();
 
-    renderTable(
-      searchInput.value
-    );
+    renderTable(searchInput.value);
 
   };
-
 
   reader.readAsArrayBuffer(file);
 
@@ -503,56 +392,34 @@ excelInput.addEventListener("change", e => {
 // =======================
 exportExcelBtn.addEventListener("click", () => {
 
-  const filtered =
-    getFilteredData(
-      searchInput.value
-    );
+  const worksheet = XLSX.utils.json_to_sheet(data);
 
+  const workbook = XLSX.utils.book_new();
 
-  const worksheet =
-    XLSX.utils.json_to_sheet(
-      filtered
-    );
+  XLSX.utils.book_append_sheet(workbook, worksheet, "PropolisData");
 
-
-  const workbook =
-    XLSX.utils.book_new();
-
-
-  XLSX.utils.book_append_sheet(
-
-    workbook,
-
-    worksheet,
-
-    "PropolisData"
-
-  );
-
-
-  XLSX.writeFile(
-
-    workbook,
-
-    "propolis_data.xlsx"
-
-  );
+  XLSX.writeFile(workbook, "propolis_data.xlsx");
 
 });
 
 
 // =======================
-// ✅ Export JSON button event
+// Export JSON button
 // =======================
-exportJSONBtn.addEventListener(
-  "click",
-  exportJSON
-);
+if (exportJSONBtn) {
+
+  exportJSONBtn.addEventListener("click", exportJSON);
+
+}
 
 
 // =======================
 // Init
 // =======================
-loadData();
+(async () => {
 
-renderTable();
+  await loadData();
+
+  renderTable();
+
+})();
