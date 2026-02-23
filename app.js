@@ -6,7 +6,6 @@ const exportExcelBtn = document.getElementById("exportExcel");
 const clearAllBtn = document.getElementById("clearAll");
 const exportJSONBtn = document.getElementById("exportJSONBtn");
 
-
 // =======================
 // Columns
 // =======================
