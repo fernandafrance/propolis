@@ -1,11 +1,7 @@
 const tableBody = document.querySelector("#dataTable tbody");
-const form = document.querySelector("#addForm");
 const searchInput = document.getElementById("search");
 const rowCount = document.getElementById("rowCount");
-const resetFormBtn = document.getElementById("resetForm");
 const clearSearchBtn = document.getElementById("clearSearch");
-const formError = document.getElementById("formError");
-const excelInput = document.getElementById("excelFile");
 const exportExcelBtn = document.getElementById("exportExcel");
 const clearAllBtn = document.getElementById("clearAll");
 const exportJSONBtn = document.getElementById("exportJSONBtn");
@@ -15,13 +11,12 @@ const exportJSONBtn = document.getElementById("exportJSONBtn");
 // Columns
 // =======================
 const columns = [
-  "References",
+  "Name Normalized",
   "InChIKey",
   "Superclass",
   "Class",
   "Subclass",
   "Parent Level 1",
-  "Name Normalized",
   "CID",
   "Canonical SMILES",
   "Molecular Formula",
@@ -51,7 +46,8 @@ const columns = [
   "botanical_source1",
   "local_flora1",
   "botanical_source2",
-  "botanical_source3"
+  "botanical_source3",
+  "References"
 ];
 
 let data = [];
@@ -66,40 +62,28 @@ function saveData() {
 
 
 // =======================
-// ✅ Load from JSON or LocalStorage
+// Load from JSON or LocalStorage
 // =======================
 async function loadData() {
 
   try {
-
-    // tenta carregar data.json do GitHub
     const response = await fetch("data.json");
 
     if (response.ok) {
-
       const jsonData = await response.json();
 
       if (jsonData.length > 0) {
-
         data = jsonData;
-
         saveData();
-
         return;
-
       }
-
     }
 
   } catch (error) {
-
-    console.warn("data.json não encontrado, usando localStorage");
-
+    console.warn("data.json not found, using localStorage");
   }
 
-  // fallback para localStorage
   const stored = localStorage.getItem("propolisData");
-
   data = stored ? JSON.parse(stored) : [];
 
 }
@@ -116,15 +100,11 @@ function exportJSON() {
   );
 
   const link = document.createElement("a");
-
   link.href = URL.createObjectURL(blob);
-
   link.download = "data.json";
 
   document.body.appendChild(link);
-
   link.click();
-
   document.body.removeChild(link);
 
 }
@@ -134,9 +114,7 @@ function exportJSON() {
 // Unique key
 // =======================
 function makeKey(row) {
-
   return `${(row.InChIKey || "").trim()}__${(row.CID || "").trim()}`;
-
 }
 
 
@@ -168,7 +146,7 @@ function renderTable(filter = "") {
 
   const filtered = getFilteredData(filter);
 
-  filtered.forEach((row, index) => {
+  filtered.forEach((row) => {
 
     const tr = document.createElement("tr");
 
@@ -179,13 +157,9 @@ function renderTable(filter = "") {
       if (col === "PubChem" && row.CID) {
 
         const a = document.createElement("a");
-
         a.href = `https://pubchem.ncbi.nlm.nih.gov/compound/${row.CID}`;
-
         a.target = "_blank";
-
         a.textContent = "PubChem";
-
         td.appendChild(a);
 
       }
@@ -209,17 +183,14 @@ function renderTable(filter = "") {
 
     });
 
-
+    // Remove button
     const tdRemove = document.createElement("td");
-
     const btn = document.createElement("button");
 
     btn.textContent = "✕";
-
-    btn.onclick = () => removeRow(index);
+    btn.onclick = () => removeRow(row);
 
     tdRemove.appendChild(btn);
-
     tr.appendChild(tdRemove);
 
     tableBody.appendChild(tr);
@@ -232,68 +203,15 @@ function renderTable(filter = "") {
 
 
 // =======================
-// Add record
-// =======================
-form.addEventListener("submit", e => {
-
-  e.preventDefault();
-
-  const required = [
-    form.elements["Name Normalized"],
-    form.elements["IUPAC Name"],
-    form.elements["Molecular Weight"],
-    form.elements["Canonical SMILES"]
-  ];
-
-  if (required.filter(f => f.value.trim()).length < 2) {
-
-    formError.textContent = "Please fill at least 2 required fields.";
-
-    return;
-
-  }
-
-  formError.textContent = "";
-
-  const formData = new FormData(form);
-
-  const row = {};
-
-  columns.forEach(col => {
-
-    row[col] = col === "PubChem"
-      ? ""
-      : (formData.get(col)?.trim() || "");
-
-  });
-
-  const key = makeKey(row);
-
-  const index = data.findIndex(r => makeKey(r) === key);
-
-  if (index >= 0)
-    data[index] = row;
-  else
-    data.push(row);
-
-  saveData();
-
-  renderTable(searchInput.value);
-
-  form.reset();
-
-});
-
-
-// =======================
 // Remove row
 // =======================
-function removeRow(index) {
+function removeRow(rowToRemove) {
 
-  data.splice(index, 1);
+  data = data.filter(row =>
+    makeKey(row) !== makeKey(rowToRemove)
+  );
 
   saveData();
-
   renderTable(searchInput.value);
 
 }
@@ -307,9 +225,7 @@ clearAllBtn.addEventListener("click", () => {
   if (!confirm("Delete ALL data?")) return;
 
   data = [];
-
   localStorage.removeItem("propolisData");
-
   renderTable();
 
 });
@@ -325,64 +241,7 @@ searchInput.addEventListener("input", () =>
 clearSearchBtn.addEventListener("click", () => {
 
   searchInput.value = "";
-
   renderTable();
-
-});
-
-
-// =======================
-// Import Excel
-// =======================
-excelInput.addEventListener("change", e => {
-
-  const file = e.target.files[0];
-
-  if (!file) return;
-
-  const reader = new FileReader();
-
-  reader.onload = e => {
-
-    const workbook = XLSX.read(
-      new Uint8Array(e.target.result),
-      { type: "array" }
-    );
-
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-
-    const imported = XLSX.utils.sheet_to_json(sheet);
-
-    imported.forEach(row => {
-
-      const newRow = {};
-
-      columns.forEach(col => {
-
-        newRow[col] = col === "PubChem"
-          ? ""
-          : (row[col]?.toString().trim() || "");
-
-      });
-
-      const key = makeKey(newRow);
-
-      const index = data.findIndex(r => makeKey(r) === key);
-
-      if (index >= 0)
-        data[index] = newRow;
-      else
-        data.push(newRow);
-
-    });
-
-    saveData();
-
-    renderTable(searchInput.value);
-
-  };
-
-  reader.readAsArrayBuffer(file);
 
 });
 
@@ -393,11 +252,9 @@ excelInput.addEventListener("change", e => {
 exportExcelBtn.addEventListener("click", () => {
 
   const worksheet = XLSX.utils.json_to_sheet(data);
-
   const workbook = XLSX.utils.book_new();
 
   XLSX.utils.book_append_sheet(workbook, worksheet, "PropolisData");
-
   XLSX.writeFile(workbook, "propolis_data.xlsx");
 
 });
@@ -407,9 +264,7 @@ exportExcelBtn.addEventListener("click", () => {
 // Export JSON button
 // =======================
 if (exportJSONBtn) {
-
   exportJSONBtn.addEventListener("click", exportJSON);
-
 }
 
 
@@ -419,7 +274,6 @@ if (exportJSONBtn) {
 (async () => {
 
   await loadData();
-
   renderTable();
 
 })();
