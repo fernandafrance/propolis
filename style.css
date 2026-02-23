@@ -4,7 +4,7 @@
   --text: #222222;
   --muted: #666666;
   --border: #e5e5e5;
-  --accent: #dcdcdc;
+  --accent: #ececec;
   --danger: #b23b3b;
 }
 
@@ -21,14 +21,14 @@ html,
 body {
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden; /* 🔴 bloqueia qualquer vazamento */
+  overflow-x: hidden;
 }
 
 body {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
   color: var(--text);
   background: var(--bg);
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 /* ===================== */
@@ -37,46 +37,55 @@ body {
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  overflow-x: hidden;
+  gap: 1rem;
 }
 
 /* ===================== */
-/* CARD BASE             */
+/* CARD PADRONIZADO      */
 /* ===================== */
 .card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-  max-width: 100%;
-  overflow-x: hidden;
-}
-
-.card:last-of-type {
-  margin-bottom: 0;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  width: 100%;
 }
 
 /* ===================== */
-/* HEADER / LOGO         */
+/* HEADER PRINCIPAL      */
 /* ===================== */
 header h1 {
-  margin-bottom: 0.5rem;
-  font-size: 3rem;
+  font-size: 2.4rem;
   font-weight: 700;
   text-align: center;
+  margin-bottom: 1rem;
 }
 
+/* ===================== */
+/* TÍTULOS PADRONIZADOS  */
+/* ===================== */
+.card h2,
+.card h3,
+.card h4,
+.card h5 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ===================== */
+/* CARD LOGO             */
+/* ===================== */
 .card.logo {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
   align-items: flex-start;
-  padding: 1.5rem;
 }
 
 .card.logo img {
@@ -90,78 +99,24 @@ header h1 {
 
 .card.logo p,
 .card.logo address {
-  font-size: 1.1rem;
-  line-height: 1.6;
+  font-size: 1rem;
   text-align: justify;
-  margin-bottom: 0.5rem;
-}
-
-/* ===================== */
-/* TÍTULOS               */
-/* ===================== */
-h2 {
-  font-size: 1rem;
-  margin: 0.5rem 0;
-}
-
-h3 {
-  font-size: 1.4rem;
-  margin: 0.5rem 0;
-}
-
-h4 {
-  margin: 0.5rem 0;
-}
-
-h5 {
-  font-size: 1rem;
-  margin: 0.3rem 0 0.75rem;
-}
-
-/* ===================== */
-/* FORMULÁRIOS           */
-/* ===================== */
-.form-error {
-  color: var(--danger);
-  font-size: 0.9rem;
   margin-bottom: 0.75rem;
 }
 
+/* ===================== */
+/* TOOLBAR               */
+/* ===================== */
 .toolbar {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .toolbar input[type="search"] {
   flex: 1;
-  padding: 0.6rem 0.8rem;
+  padding: 0.65rem 0.9rem;
   border: 1px solid var(--border);
   border-radius: 0.75rem;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 0.75rem;
-}
-
-.grid label {
-  font-size: 0.85rem;
-  color: var(--muted);
-  display: flex;
-  flex-direction: column;
-}
-
-.grid input {
-  padding: 0.55rem 0.65rem;
-  border: 1px solid var(--border);
-  border-radius: 0.6rem;
-}
-
-.actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
 }
 
 /* ===================== */
@@ -170,9 +125,10 @@ h5 {
 button {
   border: 1px solid var(--border);
   background: #fff;
-  padding: 0.55rem 0.9rem;
-  border-radius: 0.6rem;
+  padding: 0.6rem 1rem;
+  border-radius: 0.75rem;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 button:hover {
@@ -190,15 +146,13 @@ button.danger {
 }
 
 /* ===================== */
-/* TABELA (COM SCROLL)   */
+/* TABELA                */
 /* ===================== */
 .tableWrap {
   max-height: 500px;
-  overflow-y: auto;
-  overflow-x: auto;
+  overflow: auto;
   border: 1px solid var(--border);
   border-radius: 0.75rem;
-  max-width: 100%;
 }
 
 #dataTable {
@@ -209,9 +163,10 @@ button.danger {
 
 #dataTable th,
 #dataTable td {
-  padding: 0.6rem 0.7rem;
+  padding: 0.65rem 0.8rem;
   border-bottom: 1px solid var(--border);
   text-align: left;
+  font-size: 0.9rem;
 }
 
 #dataTable thead th {
@@ -223,7 +178,7 @@ button.danger {
 }
 
 #dataTable tbody tr:hover {
-  background: #f5f5f5;
+  background: #f6f6f6;
 }
 
 #dataTable td a {
@@ -237,10 +192,8 @@ button.danger {
 }
 
 /* ===================== */
-/* PDF — CORREÇÃO FINAL  */
+/* PDF                   */
 /* ===================== */
-
-/* força o card do PDF a respeitar o container */
 .card:has(iframe),
 .card:has(embed),
 .card:has(canvas) {
@@ -248,7 +201,6 @@ button.danger {
   overflow-x: hidden;
 }
 
-/* elementos internos do pdf.js */
 iframe,
 embed,
 canvas {
@@ -257,21 +209,12 @@ canvas {
   display: block;
 }
 
-/* containers criados pelo pdf.js */
-#outerContainer,
-#viewerContainer,
-#mainContainer,
-.pdfViewer {
-  max-width: 100% !important;
-  overflow-x: hidden !important;
-}
-
 /* ===================== */
 /* CARD CONTATO          */
 /* ===================== */
 .card-content {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
   align-items: flex-start;
 }
 
@@ -283,7 +226,7 @@ canvas {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
   align-items: center;
 }
 
@@ -300,17 +243,20 @@ canvas {
 footer.muted {
   color: var(--muted);
   font-size: 0.85rem;
+  text-align: center;
+  margin-top: 1rem;
 }
 
 /* ===================== */
 /* RESPONSIVO            */
 /* ===================== */
 @media (max-width: 768px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
 
   .card.logo {
+    flex-direction: column;
+  }
+
+  .card-content {
     flex-direction: column;
   }
 
