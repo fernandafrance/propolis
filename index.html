@@ -1,17 +1,18 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Propolis Worldwide Dataset</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <header class="container">
-      <h1>Propolis Worldwide Dataset</h1>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Propolis Worldwide Dataset</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
 
+<body>
 
-      <!-- Card com logo e descrição -->
+<header class="container">
+   <h1>Propolis Worldwide Dataset</h1>
+
+      <!-- Logo e descrição -->
       <section class="card logo">
         <img src="propolis worldwide dataset logo.jpg" alt="Propolis Worldwide Dataset Logo" width="400">
         <div class="text">
@@ -24,130 +25,98 @@
         </div>
       </section>
 
-      <!-- Barra de pesquisa -->
-<section class="card">
-        <h4>Search bar</h4>
-      <div class="toolbar">
-        <input id="search" type="search" placeholder="Filter by InChIKey, IUPAC Name, Compound Name, CID, etc" aria-label="search" />
-        <button id="clearSearch" class="secondary" title="Limpar busca">Clear</button>
-      </div>
-    </header>
+  <section class="card">
+    <h4>Search bar</h4>
+    <div class="toolbar">
+      <input id="search" type="search"
+        placeholder="Filter by InChIKey, IUPAC Name, Compound Name, CID, etc" />
+      <button id="clearSearch" class="secondary">Clear</button>
+    </div>
   </section>
-    </main>
+</header>
 
-  <main class="container">
-      <!-- Card da tabela de dados -->
-      <section class="card">
-        <h5>Compound Table</h5>
-        <div class="tableWrap">
-          <table id="dataTable" aria-label="Propolis dataset">
-            <thead>
-              <tr>
-                <th>References</th>
-              <th>InChIKey</th>
-              <th>Superclass</th>
-              <th>Class</th>
-              <th>Subclass</th>
-              <th>Parent Level 1</th>
-              <th>Name Normalized</th>
-              <th>CID</th>
-              <th>Canonical SMILES</th>
-              <th>Molecular Formula</th>
-              <th>Molecular Weight</th>
-              <th>IUPAC Name</th>
-              <th>PubChem</th>
-              <th>Name</th>
-              <th>Article ID</th>
-              <th>Publication Year</th>
-              <th>Mol Formula</th>
-              <th>Continent</th>
-              <th>Country</th>
-              <th>Region</th>
-              <th>Estate / Province</th>
-              <th>City</th>
-              <th>Coordinates</th>
-              <th>Altitude (m)</th>
-              <th>Month Collection</th>
-              <th>Year Collection</th>
-              <th>Sample Type</th>
-              <th>Bee Specie</th>
-              <th>Color</th>
-              <th>Consistency</th>
-              <th>Climate / Biome Zone</th>
-              <th>Methods Sample</th>
-              <th>Methods Compounds</th>
-              <th>Botanical Source 1</th>
-              <th>Local Flora 1</th>
-              <th>Botanical Source 2</th>
-              <th>Botanical Source 3</th>
-                <th class="narrow" title="Remove row">✕</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- rows injected by JS -->
-            </tbody>
-          </table>
-        </div>
-        <footer class="tableMeta">
-          <span id="rowCount">0 rows</span>
-          <!-- Botão Export movido para cá -->
-          <div class="actions" style="margin-top: 1rem;">
-            <button id="exportExcel">Export to Excel</button>
-            <button id="clearAll" class="danger">Clear all data</button>
-          </div>
-        </footer>
-      </section>
+<main class="container">
 
-      <!-- Card para visualização de PDF -->
-      <section class="card">
-        <h2>View PDF with References</h2>
-        <embed src="referencias_vancouver_numeradas.pdf" type="application/pdf" width="100%" height="600px" />
-      </section>
+  <!-- ================= TABLE ================= -->
+  <section class="card">
+    <h5>Compound Table</h5>
 
-      <!-- Card Add Record -->
-      <section class="card">
-        <h2>Add new record</h2>
-           <thead>
-              <tr>
-               <th>Please fill at least 2 of these fields: Name Normalized, IUPAC Name, Molecular Weight, Canonical SMILES.</th>
+    <div class="tableWrap">
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th>Name Normalized</th>
+            <th>InChIKey</th>
+            <th>Superclass</th>
+            <th>Class</th>
+            <th>Subclass</th>
+            <th>Parent Level 1</th>
+            <th>CID</th>
+            <th>Canonical SMILES</th>
+            <th>Molecular Formula</th>
+            <th>Molecular Weight</th>
+            <th>IUPAC Name</th>
+            <th>PubChem</th>
+            <th>Name</th>
+            <th>Article ID</th>
+            <th>Publication Year</th>
+            <th>Mol Formula</th>
+            <th>Continent</th>
+            <th>Country</th>
+            <th>Region</th>
+            <th>Estate / Province</th>
+            <th>City</th>
+            <th>Coordinates</th>
+            <th>Altitude (m)</th>
+            <th>Month Collection</th>
+            <th>Year Collection</th>
+            <th>Sample Type</th>
+            <th>Bee Specie</th>
+            <th>Color</th>
+            <th>Consistency</th>
+            <th>Climate / Biome Zone</th>
+            <th>Methods Sample</th>
+            <th>Methods Compounds</th>
+            <th>Botanical Source 1</th>
+            <th>Local Flora 1</th>
+            <th>Botanical Source 2</th>
+            <th>Botanical Source 3</th>
+            <th>References</th>
+            <th class="narrow">✕</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- rows injected by JS -->
+        </tbody>
+      </table>
+    </div>
 
-        <div id="formError" class="form-error"></div>
-        <form id="addForm" autocomplete="off">
-          <div class="grid">
-            <label>InChIKey<input name="InChIKey" /></label>
-            <label>Superclass<input name="Superclass" /></label>
-            <label>Class<input name="Class" /></label>
-            <label>Subclass<input name="Subclass" /></label>
-            <label>Parent Level 1<input name="Parent Level 1" /></label>
-            <label>Name Normalized<input name="Name Normalized" /></label>
-            <label>CID<input name="CID" /></label>
-            <label>Canonical SMILES<input name="Canonical SMILES" /></label>
-            <label>Molecular Formula<input name="Molecular Formula" /></label>
-            <label>Molecular Weight<input name="Molecular Weight" /></label>
-            <label>IUPAC Name<input name="IUPAC Name" /></label>
-            <label>PubChem (URL)<input name="PubChem" type="url" placeholder="https://pubchem.ncbi.nlm.nih.gov/compound/xxx" /></label>
-            <label>References<input name="References" placeholder="Reference1, Reference2, ..." /></label>
-          </div>
-          <div class="actions">
-            <button type="submit">Add</button>
-            <button type="button" id="resetForm" class="secondary">Reset</button>
-          </div>
-        </form>
+    <footer class="tableMeta">
+      <span id="rowCount">0 rows</span>
+      <div class="actions" style="margin-top: 1rem;">
+        <button id="exportExcel">Export to Excel</button>
+        <button id="clearAll" class="danger">Clear all data</button>
+      </div>
+    </footer>
+  </section>
 
-        <!-- Import Excel (sem o botão de export, que foi movido) -->
-        <div class="actions" style="margin-top: 1rem;">
-          <input type="file" id="excelFile" accept=".xlsx, .xls">
-        </div>
-      </section>
+  <!-- ================= PDF ================= -->
+  <section class="card">
+    <h2>View PDF with References</h2>
+    <embed src="referencias_vancouver_numeradas.pdf"
+      type="application/pdf" width="100%" height="600px" />
+  </section>
 
-    <!-- Card de contato -->
+</main>
+
+<!-- ================= CONTACT ================= -->
 <section class="card">
   <div class="card-content">
-    <!-- Texto do lado esquerdo -->
+
     <div class="card-text">
       <h3>Contact Information</h3>
-      <p>If you have any problems or questions please write us:</p>
-      <address>
+        <p>If you have any problems or questions please write us:</p>
+       <address>
         Claudia Aparecida Rainho, PhD<br>
         Sao Paulo State University - UNESP<br>
         Epigenetics Laboratory<br>
@@ -161,7 +130,6 @@
       </address>
     </div>
 
-    <!-- Fotos do lado direito -->
     <div class="card-images">
       <img src="logo capes.jpg" alt="logo capes">
       <img src="logo unesp.jpg" alt="logo unesp">
@@ -169,17 +137,17 @@
   </div>
 </section>
 
-    <footer class="container muted">
-      <small>Local storage is used to persist your data in this browser.</small>
-    </footer>
+<footer class="container muted">
+  <small>Local storage is used to persist your data in this browser.</small>
+</footer>
 
-<!-- BOTÃO EXPORT JSON (FINAL DA PÁGINA) --> 
-   <div class="container" style="text-align:center; margin: 30px;"> 
-     <button id="exportJSONBtn">Export JSON</button> 
-   </div>
+<!-- EXPORT JSON BUTTON -->
+<div class="container" style="text-align:center; margin: 30px;">
+  <button id="exportJSONBtn">Export JSON</button>
+</div>
 
-    <!-- SheetJS -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-    <script src="app.js"></script>
-  </body>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="app.js"></script>
+
+</body>
 </html>
