@@ -236,6 +236,13 @@ button.danger {
   text-align: center;
 }
 
+#dataTable td.references-cell {
+  font-size: 0.6rem;
+  white-space: pre-wrap;
+  max-width: 100ch;
+  word-break: break-word;
+}
+
 /* ===================== */
 /* PDF — CORREÇÃO FINAL  */
 /* ===================== */
